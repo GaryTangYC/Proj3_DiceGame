@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="login-container">
+      <div><input placeholder="Email" id="email" /></div>
+      <div><input type="password" placeholder="Password" id="password" /></div>
+      <div>
+        <button id="login-button">Log In</button>
+        <button id="register-button">Register</button>
+      </div>
+      <p id="warning"></p>
+    </div>
+    <div id="dashboard">
+      <p id="logged-in-as"></p>
+      <a href="#" id="logout">Log Out</a>
+    </div>
+    <br />
+    <p id="tokenOutput"></p>
+    <script src="https://cdn.jsdelivr.net/npm/js-loading-overlay@1.2.0/dist/js-loading-overlay.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/game.js"></script>
+  </body>
+</html>
