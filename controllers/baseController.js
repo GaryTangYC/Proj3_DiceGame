@@ -8,7 +8,7 @@ class BaseController {
     res.render('index');
   }
 
-  async root(req, res) {
+  async game(req, res) {
     res.render('game');
   }
 
