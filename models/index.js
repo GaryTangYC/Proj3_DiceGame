@@ -2,6 +2,7 @@ const sequelizePackage = require('sequelize');
 const allConfig = require('../config/config.js');
 
 const initUserModel = require('./userModel');
+const initGameModel = require('./gameModel');
 
 const { Sequelize } = sequelizePackage;
 
@@ -17,7 +18,8 @@ let sequelize = new Sequelize(
   config
 );
 
-db.User = initUserModel(sequelize, Sequelize.DataTypes);
+db.Users = initUserModel(sequelize, Sequelize.DataTypes);
+db.Games = initGameModel(sequelize, Sequelize.DataTypes);
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

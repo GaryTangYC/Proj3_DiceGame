@@ -22,7 +22,7 @@ loginButton.addEventListener('click', async () => {
     const { token } = response.data;
     console.log('token', token);
     localStorage.setItem('AuthToken', token);
-
+    window.location.replace("/game");
   } catch (error) {
     console.log(error)
   }
@@ -46,6 +46,7 @@ registerBtn.addEventListener('click', async () => {
     const { token } = response.data
     console.log('token', token)
     localStorage.setItem('AuthToken', token)
+    window.location.replace("/game");
   } catch (error) {
     console.log(error);
   }

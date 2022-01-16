@@ -1,6 +1,6 @@
-function initUserModel(sequelize, DataTypes) {
+function initGameModel(sequelize, DataTypes) {
   return sequelize.define(
-    'user',
+    'game',
     {
       id: {
         allowNull: false,
@@ -8,16 +8,8 @@ function initUserModel(sequelize, DataTypes) {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      email: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      password: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      coin: {
-        type: DataTypes.INTEGER,
+      gameState: {
+        type: DataTypes.JSON,
       },
       createdAt: {
         allowNull: false,
@@ -35,4 +27,4 @@ function initUserModel(sequelize, DataTypes) {
   );
 }
 
-module.exports = initUserModel;
+module.exports = initGameModel;

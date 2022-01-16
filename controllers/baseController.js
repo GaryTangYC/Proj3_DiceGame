@@ -8,8 +8,8 @@ class BaseController {
     res.render('index');
   }
 
-  async root(req, res) {
-    res.render('game');
+  async game(req, res) {
+    res.render('game', { userID: req.cookies.userID, userName: req.cookies.userName, coin: req.cookies.coin });
   }
 
 }

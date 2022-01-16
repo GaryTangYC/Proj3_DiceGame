@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const { PW_SALT_ROUND, JWT_SALT } = process.env
-const db = require('../models');
+
 const BaseController = require('./baseController')
 
 class UserController extends BaseController {
@@ -12,9 +12,9 @@ class UserController extends BaseController {
   async createUser(req, res) {
     const { email, password } = req.body
     try {
-      const userCheck = await db.User.findAll({
+      const userCheck = await this.db.Users.findAll({
         where: {
-          email: req.body.email
+          email: email
         }
       });
 
@@ -24,16 +24,17 @@ class UserController extends BaseController {
         return;
       }
       const hash = await bcrypt.hash(password, Number(PW_SALT_ROUND))
-      const user = await db.User.create({
-        email: req.body.email,
+      const user = await this.db.Users.create({
+        email: email,
         password: hash,
+        coin: 500,
       });
       const payLoad = { id: user.id, email: user.email }
       const token = jwt.sign(payLoad, JWT_SALT, { expiresIn: '2h' })
-      // res.cookie('email', user.email);
-      // res.cookie('loggedIn', true);
-      // res.send({ user });
-      return res.status(200).json({ user, token });
+      res.cookie('userID', user.id);
+      res.cookie('userName', user.email);
+      res.cookie('coin', user.coin)
+      return res.status(200).json({ success: true, token });
 
     } catch (err) {
       res.status(500).send(err);
@@ -46,7 +47,7 @@ class UserController extends BaseController {
       return res.status(500).json({ msg: 'Please fill in email & Password' })
     }
     try {
-      const user = await db.User.findOne({
+      const user = await this.db.Users.findOne({
         where: { email }
       })
       if (!user) {
@@ -55,16 +56,21 @@ class UserController extends BaseController {
       const compare = await bcrypt.compare(password, user.password)
 
       if (compare) {
-        const payLoad = { id: user.id, email: user.email }
+        const payLoad = { id: user.id, email: user.email, coin: user.coin }
         const token = jwt.sign(payLoad, JWT_SALT, { expiresIn: '2h' })
-        return res.status(200).json({ success: true, token })
+        console.log('payload running')
+        console.log('token')
+        res.cookie('userID', user.id);
+        res.cookie('userName', user.email);
+        res.cookie('coin', user.coin)
+        res.redirect('/game')
+        // return res.status(200).json({ success: true, token });
       }
       return res.status(401).json({ error: "wrong password" })
     } catch (error) {
       console.log(error);
     }
   }
-
 
 }
 

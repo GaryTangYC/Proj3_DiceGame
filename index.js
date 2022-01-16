@@ -24,9 +24,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // import Routers
 const userRouter = require('./routers/userRouters')
+const gameRouter = require('./routers/gameRouters')
 
 // Import Controllers
 const UserController = require('./controllers/userController')
+const GameController = require('./controllers/gameController')
 
 // Import Models
 const db = require('./models')
@@ -35,12 +37,16 @@ const db = require('./models')
 const auth = require('./middlewares/auth')
 
 // Initialize Controllers
-const userController = new UserController('User', db.Users, db)
+const userController = new UserController(db.Users, db)
+const gameController = new GameController(db.Games, db)
 
 // app.get('/', (req, res) => res.render('index'))
 // Initialize routers
 app.use('/', userRouter(userController));
-app.post('/register', userRouter(userController, auth));
-app.post('/login', userRouter(userController, auth));
+// app.use('/register', userRouter(userController, auth));
+// app.use('/login', userRouter(userController, auth));
+app.use('/game', gameRouter(gameController));
+
+// app.post('/startGame', gameRouter(gameController));
 
 app.listen(PORT, () => console.log(`App is listening on ${PORT}`))
