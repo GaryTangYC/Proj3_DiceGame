@@ -9,7 +9,7 @@ class BaseController {
   }
 
   async game(req, res) {
-    res.render('game');
+    res.render('game', { userID: req.cookies.userID, userName: req.cookies.userName, coin: req.cookies.coin });
   }
 
 }

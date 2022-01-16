@@ -1,77 +1,143 @@
-const email = document.getElementById('email');
-const password = document.getElementById('password');
-const errorWarning = document.getElementById('warning');
+// Provide logout button functionality
+const logoutButton = document.getElementById('logout-button');
 
+logoutButton.addEventListener('click', async () => {
 
-// Provide login button functionality
-const loginButton = document.getElementById('login-button');
+  function deleteCookies() {
+    var allCookies = document.cookie.split(';');
 
-loginButton.addEventListener('click', async () => {
+    // The "expire" attribute of every cookie is 
+    // Set to "Thu, 01 Jan 1970 00:00:00 GMT"
+    for (var i = 0; i < allCookies.length; i++)
+      document.cookie = allCookies[i] + "=;expires="
+        + new Date(0).toUTCString();
 
-  const data = {
-    email: email.value,
-    password: password.value,
+    displayCookies.innerHTML = document.cookie;
   }
-  if (!email.value || !password.value) {
-    errorWarning.innerText = 'Please fill in all details';
-    return;
-  }
-
-  try {
-    const response = await axios.post('/login', data);
-    const { token } = response.data;
-    console.log('token', token);
-    localStorage.setItem('AuthToken', token);
-
-  } catch (error) {
-    console.log(error)
-  }
+  deleteCookies()
+  storage.removeItem(AuthToken);
+  window.location.replace("/");
 })
 
-// Add register button functionality
-const registerBtn = document.getElementById('register-button');
+// Get respective messages & input by Class or ID
+const getBoardClass = document.getElementsByClassName("board");
+const getMessageDisplay = document.getElementById("messageDisplay")
+const getSmallBetValue = document.getElementById("inputSmall")
+const getBigBetValue = document.getElementById("inputBig")
 
-registerBtn.addEventListener('click', async () => {
-  if (!email.value || !password.value) {
-    errorWarning.innerText = 'Please fill in all details';
-    return;
-  }
+const betBigButton = document.getElementById("betBigButton");
+const betSmallButton = document.getElementById("betSmallButton");
+
+const getDiceDiv = document.getElementById("dice-board")
+const getDiceContainer = document.getElementById("dice-container");
+const getTableContainer = document.getElementById("table");
+const createDice1Img = document.createElement("img");
+const createDice2Img = document.createElement("img");
+const createRestartButton = document.createElement("button")
+
+const cookieValue = document.cookie.split('; ');
+const userIDCookie = cookieValue.find((row) => row.startsWith('userID=')).split('=')[1];
+const coinCookie = cookieValue.find((row) => row.startsWith('coin=')).split('=')[1];
+
+
+// bet Big game start
+betBigButton.addEventListener('click', async () => {
+
+  // Disabled bet button
+  document.getElementById("betBigButton").disabled = true
+  document.getElementById("betSmallButton").disabled = true
+
+  disabled = true;
   const data = {
-    email: email.value,
-    password: password.value,
+    userID: userIDCookie,
+    betBig: Number(getBigBetValue.value),
+    betSmall: 0,
   }
+
   try {
-    const response = await axios.post('/register', data);
-    // Obtain token data and store it in localStorage
-    const { token } = response.data
-    console.log('token', token)
-    localStorage.setItem('AuthToken', token)
+    // Send bet value to gamecontroller to apply game logic
+    console.log('data', data)
+    const response = await axios.post('/game/startGame', data)
+    console.log('this is await res data', response.data)
+
+    // assign var to gamestate for easeofcall
+    let dice1Value = response.data.game.gameState.diceRoll.dice1
+    let dice2Value = response.data.game.gameState.diceRoll.dice2
+    let didPlayerWin = response.data.game.gameState.didPlayerWin
+
+    // Create dice1 image based on dice roll from gameController
+    createDice1Img.src = `/assets/dice${dice1Value}.png`
+    getDiceContainer.appendChild(createDice1Img);
+
+    // Create dice2 image based on dice roll from gameController
+    createDice2Img.src = `/assets/dice${dice2Value}.png`
+    getDiceContainer.appendChild(createDice2Img);
+
+    // Update messagedisplay
+    if (didPlayerWin === true) {
+      getMessageDisplay.innerHTML = `You Rolled a ${dice1Value} & ${dice2Value}. You have Won! Click on the restart button to play again.`
+    } else {
+      getMessageDisplay.innerHTML = `You Rolled a ${dice1Value} & ${dice2Value}. You Lost =( Click on the restart button to play again.`
+    }
+    // Update coin value on page
+    document.getElementById('coinValue').innerHTML = `💰​ Coins:​ ${coinCookie}`
+
   } catch (error) {
     console.log(error);
   }
 })
 
-// // TO LOOK INTO ONCE SETUP GAME PAGE FOR AUTH REQUEST (start game)
+// bet Small game start
+betSmallButton.addEventListener('click', async () => {
 
-// // --> USE TOKEN FOR PUT REQUEST
+  // Disabled bet button
+  document.getElementById("betBigButton").disabled = true
+  document.getElementById("betSmallButton").disabled = true
 
-// $('#putButton').click(async () => {
-//   JsLoadingOverlay.show()
-//   const token = localStorage.getItem('sampleAuthToken')
-//   if (!token) {
-//     return alert(`No token found! Call the police!`)
-//   } else {
-//     const config = {
-//       headers: { Authorization: `Bearer ${token}` }
-//     };
-//     try {
-//       const result = await axios.put('/users', {}, config)
-//       alert(`${result.data.success}`)
-//       JsLoadingOverlay.hide()
-//     } catch (err) {
-//       alert(`got an error status of ${err.response.status}`)
-//       JsLoadingOverlay.hide()
-//     }
+  const data = {
+    userID: userIDCookie,
+    betBig: 0,
+    betSmall: Number(getSmallBetValue.value),
+  }
 
-//   }
-// })
+  try {
+    console.log('data', data)
+    const response = await axios.post('/game/startGame', data)
+
+    if (data === "error") {
+      return getMessageDisplay.innerHTML = "Don't CHEAT!!!!"
+    }
+
+    // assign var to gamestate for easeofcall
+    let dice1Value = response.data.game.gameState.diceRoll.dice1
+    let dice2Value = response.data.game.gameState.diceRoll.dice2
+    let didPlayerWin = response.data.game.gameState.didPlayerWin
+
+    // Create dice1 image based on dice roll from gameController
+    createDice1Img.src = `/assets/dice${dice1Value}.png`
+    getDiceContainer.appendChild(createDice1Img);
+
+    // Create dice2 image based on dice roll from gameController
+    createDice2Img.src = `/assets/dice${dice2Value}.png`
+    getDiceContainer.appendChild(createDice2Img);
+
+    // Update messagedisplay
+    if (didPlayerWin === true) {
+      getMessageDisplay.innerHTML = `You Rolled a ${dice1Value} & ${dice2Value}. You have Won! Click on the restart button to play again.`
+    } else {
+      getMessageDisplay.innerHTML = `You Rolled a ${dice1Value} & ${dice2Value}. You Lost =( Click on the restart button to play again.`
+    }
+
+    // Update coin value on page
+    console.log('coin cookie', coinCookie)
+    document.getElementById('coinValue').innerHTML = `💰​ Coins:​ ${coinCookie}`
+
+    // // Create restart button when round end
+    // createRestartButton.setAttribute("type" = "button")
+
+    getTableContainer.appendChild(createRestartButton);
+
+  } catch (error) {
+    console.log(error);
+  }
+})
